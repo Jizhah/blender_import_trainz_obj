@@ -1,12 +1,3 @@
-bl_info = {
-    "name": "Import OBJ from Trainz",
-    "blender": (4, 1, 0),  # Minimum Blender version
-    "category": "Import-Export",
-    "author": "ChatGPT",
-    "version": (1, 0, 0),
-    "description": "Imports Trainz OBJ files, rotates them, adjusts UVs, and adds attachment nodes.",
-}
-
 import bpy
 import os
 import math
@@ -131,6 +122,3 @@ def unregister():
     # Remove the properties
     del bpy.types.Scene.obj_filepath
     del bpy.types.Scene.ms_filepath
-
-if __name__ == "__main__":
-    register()
