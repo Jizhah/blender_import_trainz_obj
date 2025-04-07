@@ -76,12 +76,6 @@ A2: The position of attachment nodes is determined by the `.ms` file. You can ma
 ### Q3: The UV adjustments don’t match my needs. Can I change them?
 A3: The addon automatically rotates and mirrors UVs. If this doesn't fit your requirements, you can manually adjust the UVs in Blender or modify the addon’s UV processing code.
 
-## Developer Contact
-
-If you encounter any issues or have suggestions for improvements, feel free to contact the author:
-- Author: Your Name
-- Email: [YourEmail@example.com]
-
 ---
 
 # Import OBJ from Trainz 插件
@@ -161,9 +155,3 @@ A2：附加节点的位置是根据 `.ms` 文件自动设置的。如果需要�
 
 ### Q3：UV 坐标调整后不符合预期，如何修复？
 A3：插件会自动旋转并镜像 UV 坐标。如果这种方式不符合您的需求，您可以在 Blender 中手动调整 UV，或者修改插件中的 UV 处理代码。
-
-## 插件开发者联系方式
-
-如遇问题或有改进建议，欢迎与作者联系：
-- 作者：Your Name
-- 联系邮箱：[YourEmail@example.com]
