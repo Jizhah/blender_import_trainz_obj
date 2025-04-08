@@ -91,29 +91,14 @@ class ImportOBJFromTrainzOperator(bpy.types.Operator):
         import_and_process_obj(self.obj_filepath, self.ms_filepath)
         return {'FINISHED'}
 
-# Panel for the Import OBJ from Trainz addon
-class ImportOBJFromTrainzPanel(bpy.types.Panel):
-    bl_label = "Import OBJ from Trainz"
-    bl_idname = "IMPORT_PT_obj_from_trainz"
-    bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'
-    bl_category = 'Import'
-
-    def draw(self, context):
-        layout = self.layout
-        scene = context.scene
-
-        # Add file paths for OBJ and MS
-        layout.prop(scene, "obj_filepath")
-        layout.prop(scene, "ms_filepath")
-
-        # Button to execute the import
-        layout.operator("import_scene.obj_from_trainz")
+# Add operator to the Import menu
+def menu_func_import(self, context):
+    self.layout.operator(ImportOBJFromTrainzOperator.bl_idname)
 
 # Register the addon
 def register():
     bpy.utils.register_class(ImportOBJFromTrainzOperator)
-    bpy.utils.register_class(ImportOBJFromTrainzPanel)
+    bpy.types.TOPBAR_MT_file_import.append(menu_func_import)
 
     # Add properties to the scene to hold file paths
     bpy.types.Scene.obj_filepath = bpy.props.StringProperty(
@@ -125,8 +110,11 @@ def register():
 
 def unregister():
     bpy.utils.unregister_class(ImportOBJFromTrainzOperator)
-    bpy.utils.unregister_class(ImportOBJFromTrainzPanel)
+    bpy.types.TOPBAR_MT_file_import.remove(menu_func_import)
 
     # Remove the properties
     del bpy.types.Scene.obj_filepath
     del bpy.types.Scene.ms_filepath
+
+if __name__ == "__main__":
+    register()
