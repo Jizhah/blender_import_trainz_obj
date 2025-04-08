@@ -1,3 +1,11 @@
+bl_info = {
+    "name": "Import OBJ from Trainz",
+    "blender": (4, 1, 0),  # Minimum Blender version
+    "category": "Import-Export",
+    "version": (1, 0, 0),
+    "description": "Imports Trainz OBJ files, rotates them, adjusts UVs, and adds attachment nodes.",
+}
+
 import bpy
 import os
 import math
