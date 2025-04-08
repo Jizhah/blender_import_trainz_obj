@@ -2,6 +2,7 @@ bl_info = {
     "name": "Import OBJ from Trainz",
     "blender": (4, 1, 0),  # Minimum Blender version
     "category": "Import-Export",
+    "author": "Your Name",
     "version": (1, 0, 0),
     "description": "Imports Trainz OBJ files, rotates them, adjusts UVs, and adds attachment nodes.",
 }
@@ -13,7 +14,7 @@ import re
 
 # Function to import .obj file
 def import_obj(filepath):
-    bpy.ops.import_scene.obj(filepath=filepath)
+    bpy.ops.wm.obj_import(filepath=filepath)  # Updated import method for Blender 4.x
 
 # Function to rotate object by -90 degrees on the X-axis
 def rotate_object_on_x_axis(obj):
@@ -77,18 +78,48 @@ def import_and_process_obj(obj_filepath, ms_filepath):
     attachment_nodes = process_ms_file(ms_filepath)
     create_attachment_nodes(attachment_nodes)
 
-# Operator for importing the OBJ file
 class ImportOBJFromTrainzOperator(bpy.types.Operator):
     bl_idname = "import_scene.obj_from_trainz"
     bl_label = "Import OBJ from Trainz"
+    
+    # Filepath property for OBJ file (hidden in file dialog)
+    obj_filepath: bpy.props.StringProperty(name="OBJ File", subtype='NONE')
+    
+    # Filepath property for MS file (hidden in file dialog)
+    ms_filepath: bpy.props.StringProperty(name="MS File", subtype='NONE')
 
-    # Filepath properties for OBJ and MS files
-    obj_filepath: bpy.props.StringProperty(name="OBJ File", subtype='FILE_PATH')
-    ms_filepath: bpy.props.StringProperty(name="MS File", subtype='FILE_PATH')
+    # Define the invoke function to open file dialog
+    def invoke(self, context, event):
+        # Open file dialog for the OBJ file, filter to show only .obj files
+        self.filter_glob = "*.obj"
+        context.window_manager.fileselect_add(self)
+        return {'RUNNING_MODAL'}
 
+    # After file selection, set the paths correctly
     def execute(self, context):
+        # Check that the obj_filepath was selected
+        if not self.obj_filepath:
+            self.report({'ERROR'}, "No OBJ file selected")
+            return {'CANCELLED'}
+
+        # Extract the directory of the OBJ file
+        obj_dir = os.path.dirname(self.obj_filepath)
+
+        # Construct the path for the corresponding .ms file
+        ms_filepath = os.path.join(obj_dir, os.path.basename(self.obj_filepath).replace('.obj', '.im.attachment.ms'))
+
+        # Check if the corresponding .ms file exists
+        if not os.path.isfile(ms_filepath):
+            self.report({'ERROR'}, f"Attachment file not found: {ms_filepath}")
+            return {'CANCELLED'}
+
         # Call the main function to process the OBJ and MS files
-        import_and_process_obj(self.obj_filepath, self.ms_filepath)
+        try:
+            import_and_process_obj(self.obj_filepath, ms_filepath)
+        except Exception as e:
+            self.report({'ERROR'}, f"An error occurred while processing files: {str(e)}")
+            return {'CANCELLED'}
+
         return {'FINISHED'}
 
 # Add operator to the Import menu
@@ -100,21 +131,9 @@ def register():
     bpy.utils.register_class(ImportOBJFromTrainzOperator)
     bpy.types.TOPBAR_MT_file_import.append(menu_func_import)
 
-    # Add properties to the scene to hold file paths
-    bpy.types.Scene.obj_filepath = bpy.props.StringProperty(
-        name="OBJ File", subtype='FILE_PATH', default=""
-    )
-    bpy.types.Scene.ms_filepath = bpy.props.StringProperty(
-        name="MS File", subtype='FILE_PATH', default=""
-    )
-
 def unregister():
     bpy.utils.unregister_class(ImportOBJFromTrainzOperator)
     bpy.types.TOPBAR_MT_file_import.remove(menu_func_import)
-
-    # Remove the properties
-    del bpy.types.Scene.obj_filepath
-    del bpy.types.Scene.ms_filepath
 
 if __name__ == "__main__":
     register()
